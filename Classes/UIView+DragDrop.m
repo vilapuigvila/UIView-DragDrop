@@ -112,6 +112,9 @@ static char _delegate, _dropViews, _startPos, _isHovering, _mode;
         
         self.center = CGPointMake(newX, newY);
         
+        if ([delegate respondsToSelector:@selector(view:pointInView:)]) {
+            [delegate view:self pointInView:self.center];
+        }
         
         BOOL isHovering = [objc_getAssociatedObject(self, &_isHovering) boolValue];
         
