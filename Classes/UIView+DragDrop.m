@@ -100,12 +100,17 @@ static char _delegate, _dropViews, _startPos, _isHovering, _mode;
     if (recognizer.state == UIGestureRecognizerStateChanged ||
         (recognizer.state == UIGestureRecognizerStateEnded)) {
         
-        CGPoint p = [recognizer locationInView:recognizer.view.window];
-        if ([delegate respondsToSelector:@selector(view:pointInView:)]) {
-            [delegate view:self pointInView:p];
-        }
-        CGPoint trans = [recognizer translationInView:self.superview];
+        CGPoint pointInWindow = [recognizer locationInView:recognizer.view.window];
+        CGRect frameInWindow  = [recognizer.view.window convertRect:recognizer.view.frame
+                                                           fromView:self.superview];
         
+        if ([delegate respondsToSelector:@selector(view:pointInView:rectInWindow:)]) {
+            [delegate view:self
+               pointInView:pointInWindow
+              rectInWindow:frameInWindow];
+        }
+        
+        CGPoint trans = [recognizer translationInView:self.superview];
         CGFloat newX, newY;
         
         newX = self.center.x;
