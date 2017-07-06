@@ -100,6 +100,10 @@ static char _delegate, _dropViews, _startPos, _isHovering, _mode;
     if (recognizer.state == UIGestureRecognizerStateChanged ||
         (recognizer.state == UIGestureRecognizerStateEnded)) {
         
+        CGPoint p = [recognizer locationInView:recognizer.view.window];
+        if ([delegate respondsToSelector:@selector(view:pointInView:)]) {
+            [delegate view:self pointInView:p];
+        }
         CGPoint trans = [recognizer translationInView:self.superview];
         
         CGFloat newX, newY;
@@ -111,10 +115,6 @@ static char _delegate, _dropViews, _startPos, _isHovering, _mode;
         if (mode == UIViewDragDropModeNormal || mode == UIViewDragDropModeRestrictX) newX += trans.x;
         
         self.center = CGPointMake(newX, newY);
-        
-        if ([delegate respondsToSelector:@selector(view:pointInView:)]) {
-            [delegate view:self pointInView:self.center];
-        }
         
         BOOL isHovering = [objc_getAssociatedObject(self, &_isHovering) boolValue];
         
