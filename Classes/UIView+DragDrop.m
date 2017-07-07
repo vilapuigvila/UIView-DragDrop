@@ -21,12 +21,13 @@
 #define STRONG_N OBJC_ASSOCIATION_RETAIN_NONATOMIC
 #define ASSIGN   OBJC_ASSOCIATION_ASSIGN
 
-//addresses used as keys for associated objects
+/// SH: addresses used as keys for associated objects
 static char _delegate, _dropViews, _startPos, _isHovering, _mode;
 
-/**
- *  Category implementation
- */
+/// SH: Move origin view when user pan
+static const CGFloat kMoveFrameUp = 25.0;
+
+
 @implementation UIView (DragDrop)
 
 - (void) makeDraggable
@@ -83,7 +84,15 @@ static char _delegate, _dropViews, _startPos, _isHovering, _mode;
     NSArray *dropViews = objc_getAssociatedObject(self, &_dropViews);
     UIViewDragDropMode mode = [objc_getAssociatedObject(self, &_mode) integerValue];
     
+    // Move to superview
     if (recognizer.state == UIGestureRecognizerStateBegan) {
+        if ([delegate respondsToSelector:@selector(moveToSuperview)]) {
+            CGRect rect = [recognizer.view.window convertRect:recognizer.view.frame
+                                                     fromView:self.superview];
+            rect.origin.y = rect.origin.y - kMoveFrameUp;
+            recognizer.view.frame = rect;
+            [[[UIApplication sharedApplication]keyWindow]addSubview:recognizer.view];
+        }
         
         // tell the delegate we're being dragged
         if ([delegate respondsToSelector:@selector(draggingDidBeginForView:)]) {
@@ -91,7 +100,7 @@ static char _delegate, _dropViews, _startPos, _isHovering, _mode;
         }
         
         //save the starting position of the view
-        NSDictionary *startPos = @{@"x": @(self.center.x), @"y": @(self.center.y)};
+        NSDictionary *startPos = @{@"x": @(self.center.x), @"y": @(self.center.y + kMoveFrameUp)};
         
         objc_setAssociatedObject(self, &_startPos, startPos, STRONG_N);
     }
