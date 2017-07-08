@@ -25,7 +25,7 @@
 static char _delegate, _dropViews, _startPos, _isHovering, _mode;
 
 /// SH: Move origin view when user pan
-static const CGFloat kMoveFrameUp = 25.0;
+static const CGFloat kMoveFrameUp = 0;
 
 
 @implementation UIView (DragDrop)
@@ -39,6 +39,7 @@ static const CGFloat kMoveFrameUp = 25.0;
 - (void) makeDraggableWithDropViews:(NSArray *)views delegate:(id<UIViewDragDropDelegate>)delegate {
     
     //Save pertinent info
+    
     objc_setAssociatedObject(self, &_delegate, delegate, ASSIGN);
     objc_setAssociatedObject(self, &_isHovering, @NO, STRONG_N);
     objc_setAssociatedObject(self, &_mode, @(UIViewDragDropModeNormal), STRONG_N);
@@ -86,12 +87,12 @@ static const CGFloat kMoveFrameUp = 25.0;
     
     // Move to superview
     if (recognizer.state == UIGestureRecognizerStateBegan) {
-        if ([delegate respondsToSelector:@selector(moveToSuperview)]) {
+        if ([delegate respondsToSelector:@selector(moveToSuperview:)]) {
             CGRect rect = [recognizer.view.window convertRect:recognizer.view.frame
                                                      fromView:self.superview];
             rect.origin.y = rect.origin.y - kMoveFrameUp;
-            recognizer.view.frame = rect;
-            [[[UIApplication sharedApplication]keyWindow]addSubview:recognizer.view];
+            
+            [delegate moveToSuperview:recognizer.view];
         }
         
         // tell the delegate we're being dragged
@@ -114,9 +115,7 @@ static const CGFloat kMoveFrameUp = 25.0;
                                                            fromView:self.superview];
         
         if ([delegate respondsToSelector:@selector(view:pointInView:rectInWindow:)]) {
-            [delegate view:self
-               pointInView:pointInWindow
-              rectInWindow:frameInWindow];
+            [delegate view:self pointInView:pointInWindow rectInWindow:frameInWindow];
         }
         
         CGPoint trans = [recognizer translationInView:self.superview];
