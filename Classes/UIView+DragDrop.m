@@ -107,11 +107,14 @@ static const CGFloat kMoveFrameUp = 0;
     }
     
     //process the drag
+    CGPoint pointInWindow;
+    CGRect frameInWindow;
+    
     if (recognizer.state == UIGestureRecognizerStateChanged ||
         (recognizer.state == UIGestureRecognizerStateEnded)) {
         
-        CGPoint pointInWindow = [recognizer locationInView:recognizer.view.window];
-        CGRect frameInWindow  = [recognizer.view.window convertRect:recognizer.view.frame
+        pointInWindow = [recognizer locationInView:recognizer.view.window];
+        frameInWindow  = [recognizer.view.window convertRect:recognizer.view.frame
                                                            fromView:self.superview];
         
         if ([delegate respondsToSelector:@selector(view:pointInView:rectInWindow:)]) {
@@ -162,6 +165,10 @@ static const CGFloat kMoveFrameUp = 0;
         BOOL goBack = NO;
         if ( [delegate respondsToSelector:@selector(viewShouldReturnToStartingPosition:)] ) {
             goBack = [delegate viewShouldReturnToStartingPosition:self];
+        }
+        
+        if ([delegate respondsToSelector:@selector(didEndDraggingInPoint:rectInWindow:)]) {
+            [delegate didEndDraggingInPoint:pointInWindow rectInWindow:frameInWindow];
         }
         
         for (UIView *v in dropViews) {
