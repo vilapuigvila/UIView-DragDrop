@@ -167,8 +167,8 @@ static const CGFloat kMoveFrameUp = 0;
             goBack = [delegate viewShouldReturnToStartingPosition:self];
         }
         
-        if ([delegate respondsToSelector:@selector(didEndDraggingInPoint:rectInWindow:)]) {
-            [delegate didEndDraggingInPoint:pointInWindow rectInWindow:frameInWindow];
+        if ([delegate respondsToSelector:@selector(view:didEndDraggingInPoint:rectInWindow:)]) {
+            [delegate view:self didEndDraggingInPoint:pointInWindow rectInWindow:frameInWindow];
         }
         
         for (UIView *v in dropViews) {
