@@ -43,15 +43,14 @@ typedef NS_ENUM( NSInteger, UIViewDragDropMode) {
  */
 @protocol UIViewDragDropDelegate <NSObject>
 
-- (void) view:(UIView *)view wasDroppedOnDropView:(UIView *)drop;
-
 @optional
+- (void) view:(UIView *)view wasDroppedOnDropView:(UIView *)drop;
 
 - (BOOL) viewShouldReturnToStartingPosition:(UIView*)view;
 - (void) view:(UIView *)view pointInView:(CGPoint)point rectInWindow:(CGRect)rectInWindow;
 - (void) view:(UIView *)view didEndDraggingInPoint:(CGPoint)point rectInWindow:(CGRect)rectInWindow;
 
-- (BOOL) moveToSuperview:(UIView *)view;
+- (CGFloat) moveUpToFinger;
 - (void) draggingDidBeginForView:(UIView*)view;
 - (void) draggingDidEndWithoutDropForView:(UIView*)view;
 

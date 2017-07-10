@@ -24,20 +24,15 @@
 /// SH: addresses used as keys for associated objects
 static char _delegate, _dropViews, _startPos, _isHovering, _mode;
 
-/// SH: Move origin view when user pan
-static const CGFloat kMoveFrameUp = 25.0;
 
 
 @implementation UIView (DragDrop)
 
-- (void) makeDraggable
-{
+- (void) makeDraggable {
     [self makeDraggableWithDropViews:nil delegate:nil];
-
 }
 
 - (void) makeDraggableWithDropViews:(NSArray *)views delegate:(id<UIViewDragDropDelegate>)delegate {
-    
     //Save pertinent info
     
     objc_setAssociatedObject(self, &_delegate, delegate, ASSIGN);
@@ -52,25 +47,21 @@ static const CGFloat kMoveFrameUp = 25.0;
 
 #pragma mark - Setters
 
-- (void) setDelegate:(id<UIViewDragDropDelegate>)delegate
-{
+- (void) setDelegate:(id<UIViewDragDropDelegate>)delegate {
     objc_setAssociatedObject(self, &_delegate, delegate, ASSIGN);
 }
 
-- (void) setDragMode:(UIViewDragDropMode)mode
-{
+- (void) setDragMode:(UIViewDragDropMode)mode {
     objc_setAssociatedObject(self, &_mode, @(mode), STRONG_N);
 }
 
-- (void) setDropViews:(NSArray*)views
-{
+- (void) setDropViews:(NSArray*)views {
     objc_setAssociatedObject(self, &_dropViews, views, STRONG_N);
 }
 
 #pragma mark - Private API
 
-- (void) addPanGesture
-{
+- (void) addPanGesture {
     UIPanGestureRecognizer *rec;
     rec = [[UIPanGestureRecognizer alloc] initWithTarget: self
                                                   action: @selector(dragging:)];
@@ -78,18 +69,20 @@ static const CGFloat kMoveFrameUp = 25.0;
 }
 
 // Handle UIPanGestureRecognizer events
-- (void) dragging:(UIPanGestureRecognizer *)recognizer
-{
+- (void) dragging:(UIPanGestureRecognizer *)recognizer {
     //get pertinent info
     id delegate        = objc_getAssociatedObject(self, &_delegate);
     NSArray *dropViews = objc_getAssociatedObject(self, &_dropViews);
     UIViewDragDropMode mode = [objc_getAssociatedObject(self, &_mode) integerValue];
     
     // Move to superview
+    CGFloat moveUpToFinger;
     if (recognizer.state == UIGestureRecognizerStateBegan) {
-        if ([delegate respondsToSelector:@selector(moveToSuperview:)]) {
-            CGRect rect = [recognizer.view.window convertRect:recognizer.view.frame
-                                                     fromView:self.superview];
+        if ([delegate respondsToSelector:@selector(moveUpToFinger)]) {
+            moveUpToFinger        = [delegate moveUpToFinger];
+            CGRect rect           = recognizer.view.frame;
+            rect.origin.y         = rect.origin.y - moveUpToFinger;
+            recognizer.view.frame = rect;
         }
         
         // tell the delegate we're being dragged
@@ -98,7 +91,7 @@ static const CGFloat kMoveFrameUp = 25.0;
         }
         
         //save the starting position of the view
-        NSDictionary *startPos = @{@"x": @(self.center.x), @"y": @(self.center.y + kMoveFrameUp)};
+        NSDictionary *startPos = @{@"x": @(self.center.x), @"y": @(self.center.y + moveUpToFinger)};
         
         objc_setAssociatedObject(self, &_startPos, startPos, STRONG_N);
     }
