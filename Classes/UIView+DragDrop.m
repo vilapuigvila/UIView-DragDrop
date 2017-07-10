@@ -25,7 +25,7 @@
 static char _delegate, _dropViews, _startPos, _isHovering, _mode;
 
 /// SH: Move origin view when user pan
-static const CGFloat kMoveFrameUp = 0;
+static const CGFloat kMoveFrameUp = 25.0;
 
 
 @implementation UIView (DragDrop)
@@ -90,9 +90,6 @@ static const CGFloat kMoveFrameUp = 0;
         if ([delegate respondsToSelector:@selector(moveToSuperview:)]) {
             CGRect rect = [recognizer.view.window convertRect:recognizer.view.frame
                                                      fromView:self.superview];
-            rect.origin.y         = rect.origin.y - kMoveFrameUp;
-//            recognizer.view.frame = rect;
-//            [delegate moveToSuperview:recognizer.view];
         }
         
         // tell the delegate we're being dragged
@@ -114,8 +111,8 @@ static const CGFloat kMoveFrameUp = 0;
         (recognizer.state == UIGestureRecognizerStateEnded)) {
         
         pointInWindow = [recognizer locationInView:recognizer.view.window];
-        frameInWindow  = [recognizer.view.window convertRect:recognizer.view.frame
-                                                           fromView:self.superview];
+        frameInWindow = [recognizer.view.window convertRect:recognizer.view.frame
+                                                   fromView:self.superview];
         
         if ([delegate respondsToSelector:@selector(view:pointInView:rectInWindow:)]) {
             [delegate view:self pointInView:pointInWindow rectInWindow:frameInWindow];
@@ -127,8 +124,12 @@ static const CGFloat kMoveFrameUp = 0;
         newX = self.center.x;
         newY = self.center.y;
         
-        if (mode == UIViewDragDropModeNormal || mode == UIViewDragDropModeRestrictY) newY += trans.y;
-        if (mode == UIViewDragDropModeNormal || mode == UIViewDragDropModeRestrictX) newX += trans.x;
+        if (mode == UIViewDragDropModeNormal || mode == UIViewDragDropModeRestrictY) {
+            newY += trans.y;
+        }
+        if (mode == UIViewDragDropModeNormal || mode == UIViewDragDropModeRestrictX) {
+            newX += trans.x;
+        }
         
         self.center = CGPointMake(newX, newY);
         
