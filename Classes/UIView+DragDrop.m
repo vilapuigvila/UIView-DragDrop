@@ -90,9 +90,9 @@ static const CGFloat kMoveFrameUp = 0;
         if ([delegate respondsToSelector:@selector(moveToSuperview:)]) {
             CGRect rect = [recognizer.view.window convertRect:recognizer.view.frame
                                                      fromView:self.superview];
-            rect.origin.y = rect.origin.y - kMoveFrameUp;
-            
-            [delegate moveToSuperview:recognizer.view];
+            rect.origin.y         = rect.origin.y - kMoveFrameUp;
+//            recognizer.view.frame = rect;
+//            [delegate moveToSuperview:recognizer.view];
         }
         
         // tell the delegate we're being dragged
@@ -167,10 +167,6 @@ static const CGFloat kMoveFrameUp = 0;
             goBack = [delegate viewShouldReturnToStartingPosition:self];
         }
         
-        if ([delegate respondsToSelector:@selector(view:didEndDraggingInPoint:rectInWindow:)]) {
-            [delegate view:self didEndDraggingInPoint:pointInWindow rectInWindow:frameInWindow];
-        }
-        
         for (UIView *v in dropViews) {
             if (CGRectIntersectsRect(self.frame, v.frame)) {
                 //notify delegate
@@ -180,6 +176,10 @@ static const CGFloat kMoveFrameUp = 0;
                     [delegate draggingDidEndWithoutDropForView:self];
                 }
             }
+        }
+        
+        if ([delegate respondsToSelector:@selector(view:didEndDraggingInPoint:rectInWindow:)]) {
+            [delegate view:self didEndDraggingInPoint:pointInWindow rectInWindow:frameInWindow];
         }
         
         // animate back to starting point if enabled
